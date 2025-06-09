@@ -1,6 +1,8 @@
 package com.example.rent_cars_api.controller;
 
-import com.example.rent_cars_api.dto.RentalCarPatchDto;
+import com.example.rent_cars_api.dto.request.RentalCarPatchDto;
+import com.example.rent_cars_api.dto.response.RentalCarResponseDto;
+import com.example.rent_cars_api.mapper.RentalCarDtoMapper;
 import com.example.rent_cars_api.model.RentalCar;
 import com.example.rent_cars_api.service.RentalCarService;
 import jakarta.validation.Valid;
@@ -16,35 +18,37 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 public class RentalCarController {
 
     private final RentalCarService rentalCarService;
+    private final RentalCarDtoMapper rentalCarDtoMapper;
 
-    public RentalCarController(RentalCarService rentalCarService) {
+    public RentalCarController(RentalCarService rentalCarService, RentalCarDtoMapper rentalCarDtoMapper) {
         this.rentalCarService = rentalCarService;
+        this.rentalCarDtoMapper = rentalCarDtoMapper;
     }
 
     @GetMapping
-    public List<RentalCar> getRentalCars() {
-        return rentalCarService.getRentalCars();
+    public List<RentalCarResponseDto> getRentalCars() {
+        return rentalCarDtoMapper.mapToDtoList(rentalCarService.getRentalCars());
     }
 
     @GetMapping("/{id}")
-    public RentalCar getRentalCarById(@PathVariable Long id) {
-        return rentalCarService.getRentalCarById(id);
+    public RentalCarResponseDto getRentalCarById(@PathVariable Long id) {
+        return rentalCarDtoMapper.mapToDto(rentalCarService.getRentalCarById(id));
     }
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public RentalCar createRentalCar(@Valid @RequestBody RentalCar rentalCar) {
-        return rentalCarService.createRentalCar(rentalCar);
+    public RentalCarResponseDto createRentalCar(@Valid @RequestBody RentalCar rentalCar) {
+        return rentalCarDtoMapper.mapToDto(rentalCarService.createRentalCar(rentalCar));
     }
 
     @PutMapping("/{id}")
-    public RentalCar updateRentalCar(@PathVariable Long id, @Valid @RequestBody RentalCar updatedCar) {
-        return rentalCarService.updateRentalCar(id, updatedCar);
+    public RentalCarResponseDto updateRentalCar(@PathVariable Long id, @Valid @RequestBody RentalCar updatedCar) {
+        return rentalCarDtoMapper.mapToDto(rentalCarService.updateRentalCar(id, updatedCar));
     }
 
     @PatchMapping("/{id}")
-    public RentalCar partialUpdateRentalCar(@PathVariable Long id, @Valid @RequestBody RentalCarPatchDto updatedCar) {
-        return rentalCarService.partialUpdateRentalCar(id, updatedCar);
+    public RentalCarResponseDto partialUpdateRentalCar(@PathVariable Long id, @Valid @RequestBody RentalCarPatchDto updatedCar) {
+        return rentalCarDtoMapper.mapToDto(rentalCarService.partialUpdateRentalCar(id, updatedCar));
     }
 
     @DeleteMapping("/{id}")

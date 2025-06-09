@@ -1,7 +1,7 @@
 package com.example.rent_cars_api.service;
 
 
-import com.example.rent_cars_api.dto.RentalCarPatchDto;
+import com.example.rent_cars_api.dto.request.RentalCarPatchDto;
 import com.example.rent_cars_api.exception.NotFoundRentalCarException;
 import com.example.rent_cars_api.model.RentalCar;
 import com.example.rent_cars_api.repository.RentalCarRepository;

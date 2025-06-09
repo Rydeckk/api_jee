@@ -1,4 +1,4 @@
-package com.example.rent_cars_api.dto;
+package com.example.rent_cars_api.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

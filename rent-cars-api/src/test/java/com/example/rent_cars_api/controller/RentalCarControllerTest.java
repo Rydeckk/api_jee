@@ -1,7 +1,9 @@
 package com.example.rent_cars_api.controller;
 
-import com.example.rent_cars_api.dto.RentalCarPatchDto;
+import com.example.rent_cars_api.dto.request.RentalCarPatchDto;
+import com.example.rent_cars_api.dto.response.RentalCarResponseDto;
 import com.example.rent_cars_api.exception.NotFoundRentalCarException;
+import com.example.rent_cars_api.mapper.RentalCarDtoMapper;
 import com.example.rent_cars_api.model.RentalCar;
 import com.example.rent_cars_api.service.RentalCarService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,10 +36,14 @@ class RentalCarControllerTest {
     @MockitoBean
     private RentalCarService rentalCarService;
 
+    @MockitoBean
+    private RentalCarDtoMapper rentalCarDtoMapper;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private RentalCar testCar;
+    private RentalCarResponseDto testCarDto;
     private RentalCarPatchDto patchDto;
 
     @BeforeEach
@@ -52,6 +58,8 @@ class RentalCarControllerTest {
         testCar.setNumberOfDoors(4);
         testCar.setHasAirConditioning(true);
 
+        testCarDto = new RentalCarResponseDto("Toyota", "Corolla", 50.0, 500.0, 5, 4, true);
+
         patchDto = new RentalCarPatchDto();
         patchDto.setBrand("Nissan");
         patchDto.setRentAmount(60.0);
@@ -65,26 +73,32 @@ class RentalCarControllerTest {
         car2.setModel("Civic");
 
         List<RentalCar> cars = Arrays.asList(testCar, car2);
+        List<RentalCarResponseDto> carDtos = Arrays.asList(
+                testCarDto,
+                new RentalCarResponseDto("Honda", "Civic", null, null, null, null, null)
+        );
+
         when(rentalCarService.getRentalCars()).thenReturn(cars);
+        when(rentalCarDtoMapper.mapToDtoList(cars)).thenReturn(carDtos);
 
         mockMvc.perform(get("/api/rent-cars-api/rental-cars")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].brand", is("Toyota")))
                 .andExpect(jsonPath("$[0].model", is("Corolla")))
-                .andExpect(jsonPath("$[1].id", is(2)))
                 .andExpect(jsonPath("$[1].brand", is("Honda")))
                 .andExpect(jsonPath("$[1].model", is("Civic")));
 
         verify(rentalCarService, times(1)).getRentalCars();
+        verify(rentalCarDtoMapper, times(1)).mapToDtoList(cars);
     }
 
     @Test
     void getRentalCars_ShouldReturnEmptyList_WhenNoCarsExist() throws Exception {
         when(rentalCarService.getRentalCars()).thenReturn(Collections.emptyList());
+        when(rentalCarDtoMapper.mapToDtoList(Collections.emptyList())).thenReturn(Collections.emptyList());
 
         mockMvc.perform(get("/api/rent-cars-api/rental-cars")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -93,17 +107,18 @@ class RentalCarControllerTest {
                 .andExpect(jsonPath("$", hasSize(0)));
 
         verify(rentalCarService, times(1)).getRentalCars();
+        verify(rentalCarDtoMapper, times(1)).mapToDtoList(Collections.emptyList());
     }
 
     @Test
     void getRentalCarById_ShouldReturnCar_WhenCarExists() throws Exception {
         when(rentalCarService.getRentalCarById(1L)).thenReturn(testCar);
+        when(rentalCarDtoMapper.mapToDto(testCar)).thenReturn(testCarDto);
 
         mockMvc.perform(get("/api/rent-cars-api/rental-cars/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.brand", is("Toyota")))
                 .andExpect(jsonPath("$.model", is("Corolla")))
                 .andExpect(jsonPath("$.rentAmount", is(50.0)))
@@ -113,6 +128,7 @@ class RentalCarControllerTest {
                 .andExpect(jsonPath("$.hasAirConditioning", is(true)));
 
         verify(rentalCarService, times(1)).getRentalCarById(1L);
+        verify(rentalCarDtoMapper, times(1)).mapToDto(testCar);
     }
 
     @Test
@@ -125,6 +141,7 @@ class RentalCarControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(rentalCarService, times(1)).getRentalCarById(1L);
+        verify(rentalCarDtoMapper, never()).mapToDto(any());
     }
 
     @Test
@@ -148,19 +165,22 @@ class RentalCarControllerTest {
         savedCar.setNumberOfDoors(4);
         savedCar.setHasAirConditioning(true);
 
+        RentalCarResponseDto savedCarDto = new RentalCarResponseDto("Ford", "Focus", 45.0, 400.0, 5, 4, true);
+
         when(rentalCarService.createRentalCar(any(RentalCar.class))).thenReturn(savedCar);
+        when(rentalCarDtoMapper.mapToDto(savedCar)).thenReturn(savedCarDto);
 
         mockMvc.perform(post("/api/rent-cars-api/rental-cars")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCar)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(3)))
                 .andExpect(jsonPath("$.brand", is("Ford")))
                 .andExpect(jsonPath("$.model", is("Focus")))
                 .andExpect(jsonPath("$.rentAmount", is(45.0)));
 
         verify(rentalCarService, times(1)).createRentalCar(any(RentalCar.class));
+        verify(rentalCarDtoMapper, times(1)).mapToDto(savedCar);
     }
 
     @Test
@@ -175,6 +195,7 @@ class RentalCarControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(rentalCarService, never()).createRentalCar(any(RentalCar.class));
+        verify(rentalCarDtoMapper, never()).mapToDto(any());
     }
 
     @Test
@@ -189,19 +210,22 @@ class RentalCarControllerTest {
         updatedCar.setNumberOfDoors(2);
         updatedCar.setHasAirConditioning(false);
 
+        RentalCarResponseDto updatedCarDto = new RentalCarResponseDto("Honda", "Civic", 55.0, 550.0, 4, 2, false);
+
         when(rentalCarService.updateRentalCar(eq(1L), any(RentalCar.class))).thenReturn(updatedCar);
+        when(rentalCarDtoMapper.mapToDto(updatedCar)).thenReturn(updatedCarDto);
 
         mockMvc.perform(put("/api/rent-cars-api/rental-cars/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedCar)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.brand", is("Honda")))
                 .andExpect(jsonPath("$.model", is("Civic")))
                 .andExpect(jsonPath("$.rentAmount", is(55.0)));
 
         verify(rentalCarService, times(1)).updateRentalCar(eq(1L), any(RentalCar.class));
+        verify(rentalCarDtoMapper, times(1)).mapToDto(updatedCar);
     }
 
     @Test
@@ -215,6 +239,7 @@ class RentalCarControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(rentalCarService, never()).updateRentalCar(anyLong(), any(RentalCar.class));
+        verify(rentalCarDtoMapper, never()).mapToDto(any());
     }
 
     @Test
@@ -225,20 +250,23 @@ class RentalCarControllerTest {
         updatedCar.setModel("Corolla");
         updatedCar.setRentAmount(60.0);
 
+        RentalCarResponseDto updatedCarDto = new RentalCarResponseDto("Nissan", "Corolla", 60.0, null, null, null, null);
+
         when(rentalCarService.partialUpdateRentalCar(eq(1L), any(RentalCarPatchDto.class)))
                 .thenReturn(updatedCar);
+        when(rentalCarDtoMapper.mapToDto(updatedCar)).thenReturn(updatedCarDto);
 
         mockMvc.perform(patch("/api/rent-cars-api/rental-cars/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(patchDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.brand", is("Nissan")))
                 .andExpect(jsonPath("$.model", is("Corolla")))
                 .andExpect(jsonPath("$.rentAmount", is(60.0)));
 
         verify(rentalCarService, times(1)).partialUpdateRentalCar(eq(1L), any(RentalCarPatchDto.class));
+        verify(rentalCarDtoMapper, times(1)).mapToDto(updatedCar);
     }
 
     @Test
@@ -252,6 +280,7 @@ class RentalCarControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(rentalCarService, times(1)).partialUpdateRentalCar(eq(1L), any(RentalCarPatchDto.class));
+        verify(rentalCarDtoMapper, never()).mapToDto(any());
     }
 
     @Test
@@ -265,6 +294,7 @@ class RentalCarControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(rentalCarService, never()).partialUpdateRentalCar(anyLong(), any(RentalCarPatchDto.class));
+        verify(rentalCarDtoMapper, never()).mapToDto(any());
     }
 
     @Test
