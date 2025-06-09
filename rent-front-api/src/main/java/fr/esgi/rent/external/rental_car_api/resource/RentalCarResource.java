@@ -1,10 +1,10 @@
-package fr.esgi.rent.external.rental_property_api.resource;
+package fr.esgi.rent.external.rental_car_api.resource;
 
-import fr.esgi.rent.external.rental_property_api.RentalPropertyService;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyCreateDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyPatchDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyUpdateDTO;
+import fr.esgi.rent.external.rental_car_api.RentalCarService;
+import fr.esgi.rent.external.rental_car_api.dto.RentalCarCreateDTO;
+import fr.esgi.rent.external.rental_car_api.dto.RentalCarDTO;
+import fr.esgi.rent.external.rental_car_api.dto.RentalCarPatchDTO;
+import fr.esgi.rent.external.rental_car_api.dto.RentalCarUpdateDTO;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -14,24 +14,23 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/rental-properties")
+@Path("/rental-cars")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @RequestScoped
-public class RentalPropertyResource {
-
+public class RentalCarResource {
     @Inject
-    RentalPropertyService service;
+    RentalCarService service;
 
     @GET
-    public List<RentalPropertyDTO> getAll() {
-        return service.getAllRentalProperties();
+    public List<RentalCarDTO> getAll() {
+        return service.getAllRentalCars();
     }
 
     @GET
     @Path("/{id}")
     public Response getById(@PathParam("id") Long id) {
-        RentalPropertyDTO dto = service.getRentalPropertyById(id);
+        RentalCarDTO dto = service.getRentalCarById(id);
         if (dto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -39,8 +38,8 @@ public class RentalPropertyResource {
     }
 
     @POST
-    public Response createRentalProperty(@Valid RentalPropertyCreateDTO dto) {
-        boolean success = service.createRentalPropertyRequest(dto);
+    public Response createRentalCar(@Valid RentalCarCreateDTO dto) {
+        boolean success = service.createRentalCarRequest(dto);
         if (!success) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -49,8 +48,8 @@ public class RentalPropertyResource {
 
     @PUT
     @Path("/{id}")
-    public Response updateProperty(@PathParam("id") Long id, @Valid RentalPropertyUpdateDTO dto) {
-        boolean success = service.updateRentalProperty(id, dto);
+    public Response updateCar(@PathParam("id") Long id, @Valid RentalCarUpdateDTO dto) {
+        boolean success = service.updateRentalCar(id, dto);
         if (!success) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -59,9 +58,9 @@ public class RentalPropertyResource {
 
     @PATCH
     @Path("/{id}")
-    public Response patchRentalProperty(@PathParam("id") Long id, @Valid RentalPropertyPatchDTO dto) {
+    public Response patchRentalCar(@PathParam("id") Long id, @Valid RentalCarPatchDTO dto) {
         try {
-            boolean success = service.patchRentalProperty(id, dto);
+            boolean success = service.patchRentalCar(id, dto);
             if (!success) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -76,9 +75,9 @@ public class RentalPropertyResource {
 
     @DELETE
     @Path("/{id}")
-    public Response deleteRentalProperty(@PathParam("id") Long id) {
+    public Response deleteRentalCar(@PathParam("id") Long id) {
         try {
-            boolean success = service.deleteRentalProperty(id);
+            boolean success = service.deleteRentalCar(id);
             if (success) {
                 return Response.noContent().build();
             } else {
