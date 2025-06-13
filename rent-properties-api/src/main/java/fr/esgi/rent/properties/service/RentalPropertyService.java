@@ -6,7 +6,7 @@ import fr.esgi.rent.properties.dto.UpdateRentalPropertyDTO;
 import fr.esgi.rent.properties.entity.EnergyClassification;
 import fr.esgi.rent.properties.entity.PropertyType;
 import fr.esgi.rent.properties.entity.RentalProperty;
-import fr.esgi.rent.properties.exception.ResourceNotFoundException;
+import fr.esgi.rent.properties.exception.NotFoundRentalPropertyException;
 import fr.esgi.rent.properties.repository.EnergyClassificationRepository;
 import fr.esgi.rent.properties.repository.PropertyTypeRepository;
 import fr.esgi.rent.properties.repository.RentalPropertyRepository;
@@ -48,13 +48,13 @@ public class RentalPropertyService {
 
     public RentalPropertyDTO getRentalPropertyById(Long id) {
         RentalProperty property = rentalPropertyRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("RentalProperty", id));
+                .orElseThrow(() -> new NotFoundRentalPropertyException(id));
 
         return convertToDTO(property);
     }
 
     @Transactional
-    public void createRentalProperty(CreateRentalPropertyDTO dto) {
+    public RentalPropertyDTO createRentalProperty(CreateRentalPropertyDTO dto) {
         RentalProperty property = new RentalProperty();
         property.setDescription(dto.getDescription());
         property.setTown(dto.getTown());
@@ -81,16 +81,17 @@ public class RentalPropertyService {
             property.setEnergyClassificationId(energyClassification.getId());
         }
 
-        rentalPropertyRepository.save(property);
+        RentalProperty savedProperty = rentalPropertyRepository.save(property);
+        return convertToDTO(savedProperty);
     }
 
     @Transactional
-    public void updateRentalProperty(Long id, CreateRentalPropertyDTO dto) {
+    public RentalPropertyDTO updateRentalProperty(Long id, CreateRentalPropertyDTO dto) {
         RentalProperty property;
 
         if (rentalPropertyRepository.existsById(id)) {
             property = rentalPropertyRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("RentalProperty", id));
+                    .orElseThrow(() -> new NotFoundRentalPropertyException(id));
         } else {
             property = new RentalProperty();
             property.setId(id);
@@ -121,13 +122,14 @@ public class RentalPropertyService {
             property.setEnergyClassificationId(energyClassification.getId());
         }
 
-        rentalPropertyRepository.save(property);
+        RentalProperty savedProperty = rentalPropertyRepository.save(property);
+        return convertToDTO(savedProperty);
     }
 
     @Transactional
-    public void partialUpdateRentalProperty(Long id, UpdateRentalPropertyDTO dto) {
+    public RentalPropertyDTO partialUpdateRentalProperty(Long id, UpdateRentalPropertyDTO dto) {
         RentalProperty property = rentalPropertyRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("RentalProperty", id));
+                .orElseThrow(() -> new NotFoundRentalPropertyException(id));
 
         if (dto.getDescription() != null) {
             property.setDescription(dto.getDescription());
@@ -197,12 +199,13 @@ public class RentalPropertyService {
             property.setEnergyClassificationId(energyClassification.getId());
         }
 
-        rentalPropertyRepository.save(property);
+        RentalProperty savedProperty = rentalPropertyRepository.save(property);
+        return convertToDTO(savedProperty);
     }
 
     public void deleteRentalProperty(Long id) {
         if (!rentalPropertyRepository.existsById(id)) {
-            throw new ResourceNotFoundException("RentalProperty", id);
+            throw new NotFoundRentalPropertyException(id);
         }
 
         rentalPropertyRepository.deleteById(id);
