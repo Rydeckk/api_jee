@@ -6,7 +6,6 @@ import fr.esgi.rent.properties.dto.UpdateRentalPropertyDTO;
 import fr.esgi.rent.properties.service.RentalPropertyService;
 import fr.esgi.rent.properties.validator.RentalPropertyValidator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,6 @@ public class RentalPropertyController {
     private final RentalPropertyService rentalPropertyService;
     private final RentalPropertyValidator validator;
 
-    @Autowired
     public RentalPropertyController(RentalPropertyService rentalPropertyService,
                                     RentalPropertyValidator validator) {
         this.rentalPropertyService = rentalPropertyService;

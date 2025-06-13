@@ -26,7 +26,6 @@ public class RentalPropertyService {
     private final PropertyTypeRepository propertyTypeRepository;
     private final EnergyClassificationRepository energyClassificationRepository;
 
-    @Autowired
     public RentalPropertyService(RentalPropertyRepository rentalPropertyRepository,
                                  PropertyTypeRepository propertyTypeRepository,
                                  EnergyClassificationRepository energyClassificationRepository) {

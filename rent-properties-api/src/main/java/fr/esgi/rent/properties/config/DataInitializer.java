@@ -19,7 +19,6 @@ public class DataInitializer implements ApplicationRunner {
     private final PropertyTypeRepository propertyTypeRepository;
     private final EnergyClassificationRepository energyClassificationRepository;
 
-    @Autowired
     public DataInitializer(PropertyTypeRepository propertyTypeRepository,
                            EnergyClassificationRepository energyClassificationRepository) {
         this.propertyTypeRepository = propertyTypeRepository;
