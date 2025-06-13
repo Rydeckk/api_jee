@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rent-properties-api/rental-properties")
+@RequestMapping("/rental-properties")
 public class RentalPropertyController {
 
     private final RentalPropertyService rentalPropertyService;
@@ -29,7 +29,7 @@ public class RentalPropertyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RentalPropertyDTO> getRentalPropertyById(@PathVariable Long id) {
+    public ResponseEntity<RentalPropertyDTO> getRentalPropertyById(@PathVariable("id") Long id) {
         RentalPropertyDTO property = rentalPropertyService.getRentalPropertyById(id);
         return ResponseEntity.ok(property);
     }
@@ -41,19 +41,19 @@ public class RentalPropertyController {
     }
 
     @PutMapping("/{id}")
-    public RentalPropertyDTO updateRentalProperty(@PathVariable Long id,
+    public RentalPropertyDTO updateRentalProperty(@PathVariable("id") Long id,
                                                   @Valid @RequestBody CreateRentalPropertyDTO dto) {
         return rentalPropertyService.updateRentalProperty(id, dto);
     }
 
     @PatchMapping("/{id}")
-    public RentalPropertyDTO partialUpdateRentalProperty(@PathVariable Long id,
+    public RentalPropertyDTO partialUpdateRentalProperty(@PathVariable("id") Long id,
                                                          @Valid @RequestBody UpdateRentalPropertyDTO dto) {
         return rentalPropertyService.partialUpdateRentalProperty(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRentalProperty(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRentalProperty(@PathVariable("id") Long id) {
         rentalPropertyService.deleteRentalProperty(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
