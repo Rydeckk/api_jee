@@ -1,58 +1,53 @@
 package fr.esgi.rent.properties.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
-import org.springframework.lang.NonNull;
 
 @Getter
 @Setter
 public class CreateRentalPropertyDTO {
-    @NonNull
+    @NotBlank
     private String description;
 
-    @NonNull
+    @NotBlank
     private String town;
 
-    @NonNull
+    @NotBlank
     private String address;
 
-    @NonNull
+    @NotBlank
     private String propertyType;
 
-    @NonNull
+    @NotNull
+    @Positive
     private Double rentAmount;
 
-    @NonNull
+    @NotNull
+    @Positive
     private Double securityDepositAmount;
 
-    @NonNull
+    @NotNull
+    @Positive
     private Double area;
 
-    @Nullable
     private Integer numberOfBedrooms;
 
-    @Nullable
     private Integer floorNumber;
 
-    @Nullable
     private Integer numberOfFloors;
 
-    @Nullable
     private String constructionYear;
 
-    @Nullable
     private String energyClassification;
 
-    @Nullable
     private Boolean hasElevator;
 
-    @Nullable
     private Boolean hasIntercom;
 
-    @Nullable
     private Boolean hasBalcony;
 
-    @Nullable
     private Boolean hasParkingSpace;
 }

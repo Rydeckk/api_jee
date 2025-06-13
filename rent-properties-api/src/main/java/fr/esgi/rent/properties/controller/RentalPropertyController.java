@@ -4,8 +4,8 @@ import fr.esgi.rent.properties.dto.CreateRentalPropertyDTO;
 import fr.esgi.rent.properties.dto.RentalPropertyDTO;
 import fr.esgi.rent.properties.dto.UpdateRentalPropertyDTO;
 import fr.esgi.rent.properties.service.RentalPropertyService;
-import fr.esgi.rent.properties.validator.RentalPropertyValidator;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +17,9 @@ import java.util.List;
 public class RentalPropertyController {
 
     private final RentalPropertyService rentalPropertyService;
-    private final RentalPropertyValidator validator;
 
-    public RentalPropertyController(RentalPropertyService rentalPropertyService,
-                                    RentalPropertyValidator validator) {
+    public RentalPropertyController(RentalPropertyService rentalPropertyService) {
         this.rentalPropertyService = rentalPropertyService;
-        this.validator = validator;
     }
 
     @GetMapping
@@ -38,35 +35,21 @@ public class RentalPropertyController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createRentalProperty(@RequestBody CreateRentalPropertyDTO dto) {
-        List<String> errors = validator.validateCreate(dto);
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        rentalPropertyService.createRentalProperty(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @ResponseStatus(HttpStatus.CREATED)
+    public RentalPropertyDTO createRentalProperty(@Valid @RequestBody CreateRentalPropertyDTO dto) {
+        return rentalPropertyService.createRentalProperty(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateRentalProperty(@PathVariable Long id,
-                                                  @RequestBody CreateRentalPropertyDTO dto) {
-        List<String> errors = validator.validateCreate(dto);
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        rentalPropertyService.updateRentalProperty(id, dto);
-        return ResponseEntity.ok().build();
+    public RentalPropertyDTO updateRentalProperty(@PathVariable Long id,
+                                                  @Valid @RequestBody CreateRentalPropertyDTO dto) {
+        return rentalPropertyService.updateRentalProperty(id, dto);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> partialUpdateRentalProperty(@PathVariable Long id,
-                                                         @RequestBody UpdateRentalPropertyDTO dto) {
-        List<String> errors = validator.validateUpdate(dto);
-        if (!errors.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        rentalPropertyService.partialUpdateRentalProperty(id, dto);
-        return ResponseEntity.ok().build();
+    public RentalPropertyDTO partialUpdateRentalProperty(@PathVariable Long id,
+                                                         @Valid @RequestBody UpdateRentalPropertyDTO dto) {
+        return rentalPropertyService.partialUpdateRentalProperty(id, dto);
     }
 
     @DeleteMapping("/{id}")
