@@ -18,14 +18,24 @@ import java.util.List;
 @ApplicationScoped
 public class RentalPropertyService {
 
-    private final String BACKEND_URL = "http://localhost:8081/rent-properties-api";
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final String backendUrl;
+    final HttpClient client;
+    final ObjectMapper mapper;
+
+    public RentalPropertyService() {
+        this("http://localhost:8081/rent-properties-api", HttpClient.newHttpClient(), new ObjectMapper());
+    }
+
+    public RentalPropertyService(String backendUrl, HttpClient client, ObjectMapper mapper) {
+        this.backendUrl = backendUrl;
+        this.client = client;
+        this.mapper = mapper;
+    }
 
     public List<RentalPropertyDTO> getAllRentalProperties() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties"))
+                    .uri(new URI(backendUrl + "/rental-properties"))
                     .GET()
                     .build();
 
@@ -44,7 +54,7 @@ public class RentalPropertyService {
     public RentalPropertyDTO getRentalPropertyById(Long id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties/" + id))
+                    .uri(new URI(backendUrl + "/rental-properties/" + id))
                     .GET()
                     .header("Accept", "application/json")
                     .build();
@@ -69,7 +79,7 @@ public class RentalPropertyService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties"))
+                    .uri(new URI(backendUrl + "/rental-properties"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -89,7 +99,7 @@ public class RentalPropertyService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties/" + id))
+                    .uri(new URI(backendUrl + "/rental-properties/" + id))
                     .header("Content-Type", "application/json")
                     .PUT(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -109,7 +119,7 @@ public class RentalPropertyService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties/" + id))
+                    .uri(new URI(backendUrl + "/rental-properties/" + id))
                     .header("Content-Type", "application/json")
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -136,7 +146,7 @@ public class RentalPropertyService {
     public boolean deleteRentalProperty(Long id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-properties/" + id))
+                    .uri(new URI(backendUrl + "/rental-properties/" + id))
                     .DELETE()
                     .build();
 
