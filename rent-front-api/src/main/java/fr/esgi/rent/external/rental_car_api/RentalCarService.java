@@ -22,7 +22,7 @@ public class RentalCarService {
     final ObjectMapper mapper;
 
     public RentalCarService() {
-        this("http://localhost:8082/api/rent-cars-api", HttpClient.newHttpClient(), new ObjectMapper());
+        this(System.getenv().getOrDefault("BACKEND_CAR_URL", "http://localhost:8082/api/rent-cars-api"), HttpClient.newHttpClient(), new ObjectMapper());
     }
 
     public RentalCarService(String backendUrl, HttpClient client, ObjectMapper mapper) {

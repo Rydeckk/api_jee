@@ -23,7 +23,7 @@ public class RentalPropertyService {
     final ObjectMapper mapper;
 
     public RentalPropertyService() {
-        this("http://localhost:8081/rent-properties-api", HttpClient.newHttpClient(), new ObjectMapper());
+        this(System.getenv().getOrDefault("BACKEND_PROPERTY_URL", "http://localhost:8081/rent-properties-api"), HttpClient.newHttpClient(), new ObjectMapper());
     }
 
     public RentalPropertyService(String backendUrl, HttpClient client, ObjectMapper mapper) {
