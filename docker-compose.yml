@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rent-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: rent_db
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql-init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+
+  rent-front-api:
+    build:
+      context: .
+      dockerfile: ./rent-front-api/Dockerfile
+    container_name: rent-front-api
+    ports:
+      - "8080:8080"
+    environment:
+      BACKEND_PROPERTY_URL: "http://rent-properties-api:8081/rent-properties-api"
+      BACKEND_CAR_URL: "http://rent-cars-api:8082/api/rent-cars-api"
+    depends_on:
+      - mysql
+
+  rent-properties-api:
+    build:
+      context: .
+      dockerfile: ./rent-properties-api/Dockerfile
+    container_name: rent-properties-api
+    ports:
+      - "8081:8081"
+    environment:
+      MYSQL_HOST: "mysql"
+    depends_on:
+      - mysql
+
+  rent-cars-api:
+    build:
+      context: .
+      dockerfile: ./rent-cars-api/Dockerfile
+    container_name: rent-cars-api
+    ports:
+      - "8082:8082"
+    environment:
+      MYSQL_HOST: "mysql"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
