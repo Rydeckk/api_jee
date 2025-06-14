@@ -6,9 +6,6 @@ import fr.esgi.rent.external.rental_car_api.dto.RentalCarCreateDTO;
 import fr.esgi.rent.external.rental_car_api.dto.RentalCarDTO;
 import fr.esgi.rent.external.rental_car_api.dto.RentalCarPatchDTO;
 import fr.esgi.rent.external.rental_car_api.dto.RentalCarUpdateDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyCreateDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyPatchDTO;
-import fr.esgi.rent.external.rental_property_api.dto.RentalPropertyUpdateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.BadRequestException;
 
@@ -20,14 +17,24 @@ import java.util.List;
 
 @ApplicationScoped
 public class RentalCarService {
-    private final String BACKEND_URL = "http://localhost:8082/api/rent-cars-api";
-    private final HttpClient client = HttpClient.newHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final String backendUrl;
+    final HttpClient client;
+    final ObjectMapper mapper;
+
+    public RentalCarService() {
+        this("http://localhost:8082/api/rent-cars-api", HttpClient.newHttpClient(), new ObjectMapper());
+    }
+
+    public RentalCarService(String backendUrl, HttpClient client, ObjectMapper mapper) {
+        this.backendUrl = backendUrl;
+        this.client = client;
+        this.mapper = mapper;
+    }
 
     public List<RentalCarDTO> getAllRentalCars() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars"))
+                    .uri(new URI(backendUrl + "/rental-cars"))
                     .GET()
                     .build();
 
@@ -46,7 +53,7 @@ public class RentalCarService {
     public RentalCarDTO getRentalCarById(Long id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars/" + id))
+                    .uri(new URI(backendUrl + "/rental-cars/" + id))
                     .GET()
                     .header("Accept", "application/json")
                     .build();
@@ -71,7 +78,7 @@ public class RentalCarService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars"))
+                    .uri(new URI(backendUrl + "/rental-cars"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -91,7 +98,7 @@ public class RentalCarService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars/" + id))
+                    .uri(new URI(backendUrl + "/rental-cars/" + id))
                     .header("Content-Type", "application/json")
                     .PUT(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -111,7 +118,7 @@ public class RentalCarService {
             String json = mapper.writeValueAsString(dto);
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars/" + id))
+                    .uri(new URI(backendUrl + "/rental-cars/" + id))
                     .header("Content-Type", "application/json")
                     .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -138,7 +145,7 @@ public class RentalCarService {
     public boolean deleteRentalCar(Long id) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(BACKEND_URL + "/rental-cars/" + id))
+                    .uri(new URI(backendUrl + "/rental-cars/" + id))
                     .DELETE()
                     .build();
 
